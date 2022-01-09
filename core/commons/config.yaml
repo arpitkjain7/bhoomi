@@ -1,0 +1,2 @@
+# core_engine:
+#   temp_file_path: !ENV /app/data/output/polly

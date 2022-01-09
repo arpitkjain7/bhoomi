@@ -1,0 +1,41 @@
+version: "3.3"
+services:
+    bhoomi_db:
+        image: postgres:12
+        container_name: bhoomi-postgres
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        volumes:
+            - ./db/postgres/postgres-data:/var/lib/postgresql/data
+        ports:
+            - 5432:5432
+        networks:
+            - bhoomi
+        restart: "on-failure"
+
+    bhoomi_core:
+        build: core/.
+        image: bhoomi/core:latest
+        container_name: bhoomi-core
+        env_file: core/env_var
+        environment:
+            - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            - AWS_DEFAULT_REGION=us-east-2
+            - secret='b9c8e5acc65e88f817ec58d94b9664cba1385a77a1a63c1e8fa8cd5e5c5852c2'
+            - algorithm=HS256
+        volumes:
+            - ./core:/app
+            - ./logs:/app/logs
+        ports:
+            - 8000:8000
+        depends_on:
+            - bhoomi_db
+        networks:
+            - bhoomi
+        restart: "on-failure"
+
+networks:
+    bhoomi:
+        name: bhoomi-network

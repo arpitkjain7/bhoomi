@@ -1,0 +1,2 @@
+core_url=http://bhoomi_core:8000
+db_url="postgresql://postgres:postgres@bhoomi_db:5432/postgres"

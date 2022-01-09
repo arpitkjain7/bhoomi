@@ -1,2 +1,2 @@
-# bhoomi
-Data driven hydroponic agriculture automation suite
+# Bhoomi
+Data driven hydroponic agriculture automation suite.
