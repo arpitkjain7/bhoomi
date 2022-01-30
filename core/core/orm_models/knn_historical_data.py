@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Float
 from core import Base
 
 
@@ -6,7 +6,8 @@ class KNNHistoricalData(Base):
     __tablename__ = "knn_historical_data"
     __table_args__ = {"extend_existing": True}
     row_id = Column(Integer, primary_key=True, autoincrement=True)
-    water_temperature = Column(Integer)
+    water_temperature = Column(String)
+    air_temperature = Column(String)
     tds_level = Column(String)
     ph_level = Column(String)
     water_level = Column(String)

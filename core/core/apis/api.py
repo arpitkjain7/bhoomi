@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from core.apis.routes.sensor.esp32_router import esp32_router
+from core.apis.routes.sensor.inference_router import knn_inference_router
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional
+
+from fastapi import Cookie, Depends, FastAPI, Query, WebSocket, status
+from fastapi.responses import HTMLResponse
 
 app = FastAPI(
     title="bhoomi",
@@ -21,6 +26,7 @@ app.add_middleware(
 
 
 app.include_router(esp32_router, tags=["esp32 router"])
+app.include_router(knn_inference_router, tags=["prediction router"])
 
 
 @app.get("/")
