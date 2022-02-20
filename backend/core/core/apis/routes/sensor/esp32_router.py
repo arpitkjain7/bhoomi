@@ -17,11 +17,11 @@ async def save_sensor_data(
     air_temperature: float,
     tds_level: float,
     ph_level: float,
-    water_level: float,
+    water_distance: float,
 ):
     try:
         response = SensorController().update_sensor_data(
-            water_level=water_level,
+            water_distance=water_distance,
             water_temperature=water_temperature,
             air_temperature=air_temperature,
             tds_level=tds_level,
