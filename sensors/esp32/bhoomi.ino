@@ -19,20 +19,19 @@
 //initiate variables
 const char *ssid = "R.K.Jain";
 const char *password = "Arpit@123";
-const char *serverName = "http://192.168.1.100:8000/bhoomi/sensor/save_data";
+const char* serverName = "http://192.168.1.100:8000/bhoomi/sensor/save_data";
+//const char* serverName = "http://18.223.120.129:8000/bhoomi/sensor/save_data";
 const int trigPin = 5;
 const int echoPin = 18;
 long duration;
 float distanceCm, distanceInch;
-struct waterLevel
-{
+struct waterLevel {
   float waterLevelinCM;
   float waterLevelinInch;
-} waterLevelObj;
+  } waterLevelObj;
 // GPIO where the DS18B20 is connected to
 const int oneWireBus = 4;
-struct temperature
-{
+struct temperature {
   float temperatureInC;
   float temperatureInF;
 } temperatureObj;
@@ -40,62 +39,60 @@ int sensorValue = 0, phval = 0, buffer_arr[10], temp;
 float tdsValue = 0, Voltage = 0, ph_calibration_value = 20.27; //20.24 - 0.7; //21.34 - 0.7
 unsigned long int avgval;
 float ph_value, air_temp, air_humidity;
+const int ph_up_relay = 26;
+const int ph_down_relay = 32;
+const int nutrient_relay = 33;
 
 WiFiClient client;
 OneWire oneWire(oneWireBus);
 DallasTemperature waterTempSensor(&oneWire);
 DHT dht(16, DHT11);
 
-void getWaterLevel()
-{
-  //  struct waterLevel waterLevelInstance;
+void getWaterLevel() {
+//  struct waterLevel waterLevelInstance;
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
   // Sets the trigPin on HIGH state for 10 micro seconds
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
-
+  
   // Reads the echoPin, returns the sound wave travel time in microseconds
   duration = pulseIn(echoPin, HIGH);
-
+  
   // Calculate the distance
-  distanceCm = duration * SOUND_SPEED / 2;
-
+  distanceCm = duration * SOUND_SPEED/2;
+  
   // Convert to inches
   distanceInch = distanceCm * CM_TO_INCH;
   waterLevelObj.waterLevelinCM = distanceCm;
   waterLevelObj.waterLevelinInch = distanceInch;
-  //  return waterLevelInstance;
+//  return waterLevelInstance;
 }
 
-void getWaterTemperature()
-{
-  waterTempSensor.requestTemperatures();
+void getWaterTemperature() {
+  waterTempSensor.requestTemperatures(); 
   float temperatureC = waterTempSensor.getTempCByIndex(0);
   float temperatureF = waterTempSensor.getTempFByIndex(0);
   temperatureObj.temperatureInC = temperatureC;
   temperatureObj.temperatureInF = temperatureF;
 }
 
-void getAirTemperature()
-{
+void getAirTemperature() {
   air_humidity = dht.readHumidity();
   air_temp = dht.readTemperature();
 }
-
-float getWaterHardness()
-{
+  
+float getWaterHardness() {
   sensorValue = analogRead(39);
   //Convert analog reading to Voltage
-  Voltage = sensorValue * (3.3 / 4095);
+  Voltage = sensorValue*(3.3/4095);
   //Convert voltage value to TDS value
-  float tds = (133.42 * Voltage * Voltage * Voltage - 255.86 * Voltage * Voltage + 857.39 * Voltage) * 0.5;
+  float tds=(133.42*Voltage*Voltage*Voltage - 255.86*Voltage*Voltage + 857.39*Voltage)*0.5;
   return tds;
 }
 
-float getPhValue()
-{
+float getPhValue() {
   for (int i = 0; i < 10; i++)
   {
     buffer_arr[i] = analogRead(34);
@@ -116,58 +113,84 @@ float getPhValue()
   avgval = 0;
   for (int i = 2; i < 8; i++)
     avgval += buffer_arr[i];
-  float volt = (float)avgval * (3.3 / 4095.0 / 6);
+    float volt = (float)avgval * (3.3 / 4095.0 / 6);
   float ph_act = -5.70 * volt + ph_calibration_value;
   return ph_act;
 }
 
-void sendData(String water_temperature, String air_temperature, String tds_level, String ph_level, String water_distance)
-{
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    WiFiClient client;
-    HTTPClient http;
-    // Your Domain name with URL path or IP address with path
-    http.begin(client, serverName);
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    String httpRequest = "water_temperature=" + water_temperature + "&air_temperature=" + air_temperature + "&tds_level=" + tds_level + "&ph_level=" + ph_level + "&water_distance=" + water_distance;
-    Serial.print(httpRequest);
-    int httpResponseCode = http.POST(httpRequest);
-    Serial.print("HTTP Response code: ");
-    Serial.println(httpResponseCode);
-    String payload = "{}";
-    if (httpResponseCode == 200)
-    {
-      payload = http.getString();
+void sendData(String water_temperature,String air_temperature,String tds_level,String ph_level,String water_distance) {
+  if(WiFi.status()== WL_CONNECTED){
+      WiFiClient client;
+      HTTPClient http;
+      // Your Domain name with URL path or IP address with path
+      http.begin(client, serverName);
+      http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+      String httpRequest = "water_temperature=" + water_temperature + "&air_temperature=" + air_temperature + "&tds_level=" + tds_level + "&ph_level=" + ph_level + "&water_distance=" + water_distance;
+      Serial.print(httpRequest);
+      int httpResponseCode = http.POST(httpRequest);
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String payload = "{}";
+      if (httpResponseCode == 200){
+        payload = http.getString();
+      }
+      StaticJsonDocument<300> doc;
+      auto error = deserializeJson(doc, payload);
+      if (error) {
+        Serial.print(F("deserializeJson() failed with code "));
+        Serial.println(error.c_str());
+        return;
+      }
+      const String tds_level = doc["tds_level"];
+      const String waterTempRelayPosition = doc["water_temperature"];
+      const String ph_level = doc["ph_level"];
+      int pos_id = doc["position_id"];
+      Serial.print("HTTP Response payload: ");
+      Serial.println(payload);
+      Serial.println(tds_level);
+      Serial.println(ph_level);
+      if(tds_level == "LOW"){
+        digitalWrite(nutrient_relay, LOW);
+        Serial.println("Nutrient Motor ON");
+        delay(2000);
+        digitalWrite(nutrient_relay, HIGH);
+        Serial.println("Nutrient Motor OFF");
+        delay(2000);
+      }
+      if(ph_level == "LOW"){
+        digitalWrite(ph_up_relay, LOW);
+        Serial.println("pH Up Motor ON");
+        delay(2000);
+        digitalWrite(ph_up_relay, HIGH);
+        Serial.println("pH Up Motor OFF");
+        delay(2000);
+      }
+      if(ph_level == "HIGH"){
+        digitalWrite(ph_down_relay, LOW);
+        Serial.println("pH Down Motor ON");
+        delay(2000);
+        digitalWrite(ph_down_relay, HIGH);
+        Serial.println("pH Down Motor OFF");
+        delay(2000);
+      }
+      http.end();
     }
-    StaticJsonDocument<300> doc;
-    auto error = deserializeJson(doc, payload);
-    if (error)
-    {
-      Serial.print(F("deserializeJson() failed with code "));
-      Serial.println(error.c_str());
-      return;
+    else {
+      Serial.println("WiFi Disconnected");
     }
-    const char *tdsRelayPosition = doc["tds_level"];
-    const char *waterTempRelayPosition = doc["water_temperature"];
-    const char *phRelayPosition = doc["ph_level"];
-    int pos_id = doc["position_id"];
-    Serial.print("HTTP Response payload: ");
-    Serial.println(payload);
-    Serial.println(tdsRelayPosition);
-    http.end();
-  }
-  else
-  {
-    Serial.println("WiFi Disconnected");
-  }
 }
-void setup()
-{
-  Serial.begin(115200);     // Starts the serial communication
+void setup() {
+  Serial.begin(115200); // Starts the serial communication
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
-  pinMode(echoPin, INPUT);  // Sets the echoPin as an Input
-  waterTempSensor.begin();  // Start the DS18B20 sensor
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  pinMode(ph_up_relay, OUTPUT);
+  pinMode(ph_down_relay, OUTPUT);
+  pinMode(nutrient_relay, OUTPUT);
+  Serial.println("All relays OFF");
+  digitalWrite(ph_up_relay, HIGH);
+  digitalWrite(ph_down_relay, HIGH);
+  digitalWrite(nutrient_relay, HIGH);
+  waterTempSensor.begin(); // Start the DS18B20 sensor
   Wire.begin();
   dht.begin();
   WiFi.begin(ssid, password);
@@ -180,8 +203,7 @@ void setup()
   Serial.println(WiFi.localIP());
 }
 
-void loop()
-{
+void loop() {
   // Get water level
   getAirTemperature();
   Serial.println(" --- Air Condition --- ");
@@ -201,7 +223,7 @@ void loop()
   ph_value = getPhValue();
   Serial.println(" --- Water pH Level --- ");
   Serial.printf("pH Val = %f\n", ph_value);
-  sendData((String)temperatureObj.temperatureInC, (String)air_temp, (String)tdsValue, (String)ph_value, (String)waterLevelObj.waterLevelinCM);
+  sendData((String)temperatureObj.temperatureInC,(String)air_temp,(String)tdsValue,(String)ph_value,(String)waterLevelObj.waterLevelinCM);
   Serial.println("******************************************");
-  delay(20000);
+  delay(30000);
 }

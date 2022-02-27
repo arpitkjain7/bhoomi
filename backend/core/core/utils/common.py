@@ -1,4 +1,4 @@
-sensor_height = 30
+sensor_height = 19
 levels = 10
 
 
