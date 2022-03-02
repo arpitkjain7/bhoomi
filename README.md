@@ -24,4 +24,14 @@ Smart actuator module, powered by ML algorithm to maintain the desired condition
 ![Bhoomi Functional Architecture](https://github.com/arpitkjain7/bhoomi/blob/c3e34703a51c88f2be4f4753b17582b1da232b35/bhoomi-Functional-architecture.png)
 
 ## Technical Architecture
-![Bhoomi Technical Architecture](https://github.com/arpitkjain7/bhoomi/blob/c3e34703a51c88f2be4f4753b17582b1da232b35/bhoomi-Functional-architecture.png)
+![Bhoomi Technical Architecture](https://github.com/arpitkjain7/bhoomi/blob/54e92e03f20fd6685a221fb7a5f974e9d0752584/bhoomi-Technical-architecture.png)
+
+## Visualization
+
+An intuitive understanding of the current condition of the system is a must for effective monitoring.
+
+The pH, EC, Temperature, and water levels can be monitored using a simple mobile application.
+
+Predictions and the actions taken by the actuator module can also be controlled manually from the application.
+
+## Results
