@@ -35,3 +35,9 @@ The pH, EC, Temperature, and water levels can be monitored using a simple mobile
 Predictions and the actions taken by the actuator module can also be controlled manually from the application.
 
 ## Results
+
+Training accuracy : 95.2%
+Test accuracy : 91.02%
+
+![Bhoomi KNN results](https://github.com/arpitkjain7/bhoomi/blob/63673c878eb05d8102f446aaa177b87f10b3638a/bhoomi-confusion-metrics.png)
+
