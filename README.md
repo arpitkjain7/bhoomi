@@ -21,7 +21,7 @@ Framework to automate all the processes and steps involved in hydroponic agricul
 Smart actuator module, powered by ML algorithm to maintain the desired conditioning for the plants.
 
 ## Functional Architecture
-![Bhoomi Functional Architecture](https://github.com/arpitkjain7/bhoomi/blob/8f3a3e4c3fe446ecff32b1404a2809de08b028de/bhoomi-Functional-architecture.png)
+![Bhoomi Functional Architecture](https://github.com/arpitkjain7/bhoomi/blob/dda1d3b30bbf6c08809cdfc02f6d73b0b53c745a/bhoomi-Functional-architecture.png)
 
 ## Technical Architecture
 ![Bhoomi Technical Architecture](https://github.com/arpitkjain7/bhoomi/blob/54e92e03f20fd6685a221fb7a5f974e9d0752584/bhoomi-Technical-architecture.png)
