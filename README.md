@@ -24,7 +24,7 @@ Smart actuator module, powered by ML algorithm to maintain the desired condition
 ![Bhoomi Functional Architecture](https://github.com/arpitkjain7/bhoomi/blob/dda1d3b30bbf6c08809cdfc02f6d73b0b53c745a/bhoomi-Functional-architecture.png)
 
 ## Technical Architecture
-![Bhoomi Technical Architecture](https://github.com/arpitkjain7/bhoomi/blob/54e92e03f20fd6685a221fb7a5f974e9d0752584/bhoomi-Technical-architecture.png)
+![Bhoomi Technical Architecture](https://github.com/arpitkjain7/bhoomi/blob/5d089ab9fcf671969c81c37a475b1f42689925bd/bhoomi-Technical-architecture.png)
 
 ## Visualization
 
