@@ -67,11 +67,27 @@ class SensorController:
 
     def get_sensor_data(self):
         try:
-            logging.info("executing update_sensor_data function")
-            response = self.CRUDSensorData.read_all()
+            logging.info("executing get_sensor_data function")
+            return self.CRUDSensorData.read_all()
+        except Exception as error:
+            logging.error(f"Error in get_sensor_data function: {error}")
+            raise error
+
+    def get_sensor_data_100(self):
+        try:
+            logging.info("executing get_sensor_data function")
+            return self.CRUDSensorData.read_latest_100_records()
+        except Exception as error:
+            logging.error(f"Error in get_sensor_data function: {error}")
+            raise error
+
+    def get_latest_sensor_data(self):
+        try:
+            logging.info("executing get_latest_sensor_data function")
+            response = self.CRUDSensorData.read_latest()
             return response
         except Exception as error:
-            logging.error(f"Error in update_sensor_data function: {error}")
+            logging.error(f"Error in get_latest_sensor_data function: {error}")
             raise error
 
 

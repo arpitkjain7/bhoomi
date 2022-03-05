@@ -35,10 +35,19 @@ async def save_sensor_data(
         raise error
 
 
-@esp32_router.post("/bhoomi/sensor/get")
+@esp32_router.get("/bhoomi/sensor/get_all")
 async def get_sensor_data():
     try:
-        return SensorController().get_sensor_data()
+        return SensorController().get_sensor_data_100()
+    except Exception as error:
+        logging.error(f"Error in /bhoomi/sensor/save_data endpoint: {error}")
+        raise error
+
+
+@esp32_router.get("/bhoomi/sensor/get_latest")
+async def get_latest_sensor_data():
+    try:
+        return SensorController().get_latest_sensor_data()
     except Exception as error:
         logging.error(f"Error in /bhoomi/sensor/save_data endpoint: {error}")
         raise error

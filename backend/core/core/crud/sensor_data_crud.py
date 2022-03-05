@@ -1,5 +1,6 @@
 from core import session, logger
 from core.orm_models.sensor_data import SensorData
+from sqlalchemy import desc
 
 logging = logger(__name__)
 
@@ -63,12 +64,66 @@ class CRUDSensorData:
             logging.info("CRUDSensorData read_all request")
             with session() as transaction_session:
                 obj: SensorData = transaction_session.query(SensorData).all()
+                logging.info(obj)
+            if obj is not None:
+                logging.info([row.__dict__ for row in obj])
+                return [row.__dict__ for row in obj]
+            else:
+                return []
+        except Exception as error:
+            logging.error(f"Error in CRUDSensorData read_all function : {error}")
+            raise error
+
+    def read_latest_100_records(self):
+        """[CRUD function to read_all User profile records]
+
+        Raises:
+            error: [Error returned from the DB layer]
+
+        Returns:
+            [list]: [all user records]
+        """
+        try:
+            logging.info("CRUDSensorData read_all request")
+            with session() as transaction_session:
+                obj: SensorData = (
+                    transaction_session.query(SensorData)
+                    .order_by(desc(SensorData.created_at))
+                    .limit(100)
+                    .all()
+                )
             if obj is not None:
                 return [row.__dict__ for row in obj]
             else:
                 return []
         except Exception as error:
             logging.error(f"Error in CRUDSensorData read_all function : {error}")
+            raise error
+
+    def read_latest(self):
+        """[CRUD function to read_latest User profile records]
+
+        Raises:
+            error: [Error returned from the DB layer]
+
+        Returns:
+            [list]: [all user records]
+        """
+        try:
+            logging.info("CRUDSensorData read_latest request")
+            with session() as transaction_session:
+                obj: SensorData = (
+                    transaction_session.query(SensorData)
+                    .order_by(desc(SensorData.created_at))
+                    .limit(2)
+                    .all()
+                )
+            if obj is not None:
+                return [row.__dict__ for row in obj]
+            else:
+                return []
+        except Exception as error:
+            logging.error(f"Error in CRUDSensorData read_latest function : {error}")
             raise error
 
     def update(self, **kwargs):
